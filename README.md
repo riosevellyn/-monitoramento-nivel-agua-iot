@@ -15,7 +15,7 @@ Este projeto tem como objetivo monitorar o nível de água de um reservatório u
 - Comunicação TCP/IP
 
 ## Como Reproduzir
-1. Instale o Node-RED e configure o fluxo.
+1. Abra o Wokwi e configure o fluxo.
 2. Execute o script de simulação do sensor (em `src/`).
 3. Configure o broker MQTT no Node-RED.
 4. Acompanhe os dados no dashboard do Node-RED.

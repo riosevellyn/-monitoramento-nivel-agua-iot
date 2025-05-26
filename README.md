@@ -9,7 +9,7 @@ Este projeto tem como objetivo monitorar o nível de água de um reservatório u
 - Uso de Broker Mosquitto
 
 ## Tecnologias Utilizadas
-- Node-RED
+- Wokwi
 - MQTT (Broker Mosquitto)
 - Simulação de sensores
 - Comunicação TCP/IP

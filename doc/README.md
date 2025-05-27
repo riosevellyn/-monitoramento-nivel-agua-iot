@@ -28,7 +28,7 @@ O sistema foi desenvolvido com base na arquitetura pub/sub do protocolo MQTT, co
 - Broker	Intermediário que roteia as mensagens entre sensor e relé
 - WokWi	Plataforma de simulação que integra os dispositivos e gerencia lógica
 
-##Demonstração da Comunicação MQTT
+## Demonstração da Comunicação MQTT
 Durante a execução do sistema:
 
 - O sensor publica um valor de nível simulado em /nivel_caixa

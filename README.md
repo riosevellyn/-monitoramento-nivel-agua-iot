@@ -4,7 +4,7 @@ Este projeto tem como objetivo monitorar o nível de água de um reservatório u
 
 ## Funcionalidades
 - Envio de dados do nível de água via MQTT
-- Visualização em tempo real no Node-RED
+- Visualização em tempo real no Wokwi
 - Acionamento de relé virtual conforme o nível
 - Uso de Broker Mosquitto
 

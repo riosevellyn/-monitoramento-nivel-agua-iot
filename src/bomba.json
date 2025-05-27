@@ -1,0 +1,20 @@
+{
+  "name": "Bomba de Água + MQTT + Automação",
+  "platform": "arduino",
+  "board": "esp32dev",
+  "sketch": "#include <WiFi.h>\n#include <PubSubClient.h>\n\n// Wi-Fi simulado pelo Wokwi e broker interno\nconst char* ssid = \"WOKWI-SSID\";\nconst char* password = \"12345678\";\nconst char* mqtt_server = \"mqtt-broker\";\n\nWiFiClient   espClient;\nPubSubClient client(espClient);\n\n#define LED_LOW   18\n#define LED_MID   19\n#define LED_HIGH  21\n#define LED_PUMP  27\n\nunsigned int level = 0;\nint direction = 1;\nbool pumpState = false;\n\nvoid setup_wifi() {\n  WiFi.begin(ssid, password);\n  while (WiFi.status() != WL_CONNECTED) delay(100);\n}\n\nvoid mqttCallback(char* topic, byte* payload, unsigned int len) {\n  String msg;\n  for (unsigned int i=0; i<len; i++) msg += (char)payload[i];\n  if (String(topic) == \"bomba/comando\") {\n    pumpState = (msg == \"ON\");\n  }\n}\n\nvoid reconnect() {\n  while (!client.connected()) {\n    if (client.connect(\"ESP32PumpSim\")) {\n      client.subscribe(\"bomba/comando\");\n    } else delay(500);\n  }\n}\n\nvoid setup() {\n  Serial.begin(115200);\n  pinMode(LED_LOW, OUTPUT);\n  pinMode(LED_MID, OUTPUT);\n  pinMode(LED_HIGH, OUTPUT);\n  pinMode(LED_PUMP, OUTPUT);\n\n  setup_wifi();\n  client.setServer(mqtt_server, 1883);\n  client.setCallback(mqttCallback);\n}\n\nvoid loop() {\n  if (!client.connected()) reconnect();\n  client.loop();\n\n  // Simula nível de água oscilando entre 200 e 700\n  level += direction * 15;\n  if (level > 700) direction = -1;\n  if (level < 200) direction = 1;\n\n  // Automação: liga bomba se nível abaixo de 300\n  if (level < 300) pumpState = true;\n\n  // Atualiza LED da bomba\n  digitalWrite(LED_PUMP, pumpState ? HIGH : LOW);\n\n  // LEDs de indicação de nível\n  if (level < 300) {\n    digitalWrite(LED_LOW, LOW);\n    digitalWrite(LED_MID, HIGH);\n    digitalWrite(LED_HIGH, HIGH);\n  } else if (level < 500) {\n    digitalWrite(LED_LOW, HIGH);\n    digitalWrite(LED_MID, LOW);\n    digitalWrite(LED_HIGH, HIGH);\n  } else {\n    digitalWrite(LED_LOW, HIGH);\n    digitalWrite(LED_MID, HIGH);\n    digitalWrite(LED_HIGH, LOW);\n  }\n\n  // Publica status\n  String payload = String(\"{\\\"level\\\":\") + level + \n                   String(\",\\\"pump\\\":\") + (pumpState?\"true\":\"false\") + \"}\";\n  client.publish(\"bomba/status\", payload.c_str());\n\n  delay(1000);\n}\n",
+  "components": [
+    { "type": "esp32",       "position": { "x": 150, "y": 100 } },
+    { "type": "mqtt-broker", "broker": "test.mosquitto.org" },
+    { "type": "led",         "pins": [ { "pin": "18", "node": 2 }, { "pin": "GND", "node": 0 } ], "color": "blue",  "label": "Nível BAIXO" },
+    { "type": "led",         "pins": [ { "pin": "19", "node": 3 }, { "pin": "GND", "node": 0 } ], "color": "yellow","label": "Nível MÉDIO" },
+    { "type": "led",         "pins": [ { "pin": "21", "node": 4 }, { "pin": "GND", "node": 0 } ], "color": "red",   "label": "Nível ALTO" },
+    { "type": "led",         "pins": [ { "pin": "27", "node": 5 }, { "pin": "GND", "node": 0 } ], "color": "green", "label": "Bomba" }
+  ],
+  "connections": [
+    { "nodes": [0,2] },
+    { "nodes": [0,3] },
+    { "nodes": [0,4] },
+    { "nodes": [0,5] }
+  ]
+}
